@@ -53,18 +53,22 @@ print("Initial setup done.. collecting now data..")
 #Get data from the steam community market
 def getData(timeframe, itemid, currency, country, language):
     time.sleep(timeframe)
-    response = requests.get("https://steamcommunity.com/market/itemordershistogram?country=" + str(country) + "&language=" + str(language) + "&currency=" + str(currency) + "&item_nameid=" + str(itemid) + "&two_factor=0")
-    if response.status_code == 200:
-        data = ast.literal_eval(str(response.json()))
-        date_now = datetime.now()
+    try:
+        response = requests.get("https://steamcommunity.com/market/itemordershistogram?country=" + str(country) + "&language=" + str(language) + "&currency=" + str(currency) + "&item_nameid=" + str(itemid) + "&two_factor=0")
+        if response.status_code == 200:
+            data = ast.literal_eval(str(response.json()))
+            date_now = datetime.now()
 
-        val = (str(date_now), data['highest_buy_order'], data['lowest_sell_order'])
-        print(val)
-        cursor.execute(sql, val)
-        db.commit()
-        print(cursor.rowcount, "record inserted.")
-    else:
-        print("Can't retrieve Data; Error: " + str(response.status_code))
+            val = (str(date_now), data['highest_buy_order'], data['lowest_sell_order'])
+            print(val)
+            cursor.execute(sql, val)
+            db.commit()
+            print(cursor.rowcount, "record inserted.")
+        else:
+            print("Can't retrieve Data; Error: " + str(response.status_code))
+    except requests.exceptions.ConnectionError:
+        print("Connection Error.. Retrying in 60 Seconds")
+        time.sleep(60)
 
 #Startup
 while True:
