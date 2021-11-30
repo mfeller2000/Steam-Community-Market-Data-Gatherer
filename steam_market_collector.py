@@ -9,9 +9,10 @@ try:
         passwd="",
         database=""
     )
-    print("Successfully connected to database..")
+    print("Successfully connected to Database..")
 except:
-    print("Error.. cannot connect to database..")
+    print("Error.. Can't connect to Database")
+    sys.exit(1)
 
 #Variables setup
 #Interval in seconds
@@ -69,6 +70,10 @@ def getData(timeframe, itemid, currency, country, language):
     except requests.exceptions.ConnectionError:
         print("Connection Error.. Retrying in 60 Seconds")
         time.sleep(60)
+    except mysql.connector.Error as error:
+        print("Database Error: " + error)
+    except:
+        print("Something went wrong..")
 
 #Startup
 while True:
